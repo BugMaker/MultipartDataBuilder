@@ -108,8 +108,8 @@ artifacts {
 }
 
 Properties properties = new Properties()
-if (project.hasProperty('private.properties')
-        && new File(project.property('private.properties')).exists()) {
+if (project.rootProject.file('private.properties').exists()) {
+    println 'Private.properies found ;)'
     properties.load(project.rootProject.file('private.properties').newDataInputStream())
 }
 
