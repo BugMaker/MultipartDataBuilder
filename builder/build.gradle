@@ -101,15 +101,22 @@ task javadocJar(type: Jar, dependsOn: javadoc) {
     classifier = 'javadoc'
     from javadoc.destinationDir
 }
+
 artifacts {
     archives javadocJar
     archives sourcesJar
 }
 
+Properties properties = new Properties()
+if (project.hasProperty('private.properties')
+        && new File(project.property('private.properties')).exists()) {
+    properties.load(project.rootProject.file('private.properties').newDataInputStream())
+}
+
 apply plugin: 'com.jfrog.bintray'
 bintray {
-    user = BINTRAY_USER
-    key = BINTRAY_API_KEY
+    user = properties.getProperty("bintray.user")
+    key = properties.getProperty("bintray.apikey")
 
     configurations = ['archives']
     pkg {
@@ -127,7 +134,7 @@ bintray {
             //gpg {
             //    sign = true //Determines whether to GPG sign the files. The default is false
             //    passphrase = properties.getProperty("bintray.gpg.password")
-            }
         }
     }
+}
 
