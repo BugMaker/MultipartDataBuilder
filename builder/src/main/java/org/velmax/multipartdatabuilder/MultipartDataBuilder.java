@@ -27,9 +27,10 @@ public class MultipartDataBuilder {
     PrintWriter writer = null;
 
     /**
+     * Simple class for post multipart data with HttpUrlConnection
      *
      * @param connection Your HttpUrlConnection
-     * @param charset Charset. I most cases it's "UTF-8"
+     * @param charset    Charset. I most cases it's "UTF-8"
      * @throws IOException
      */
     public MultipartDataBuilder(HttpURLConnection connection, String charset) throws IOException {
@@ -55,9 +56,10 @@ public class MultipartDataBuilder {
 
     /**
      * Adds header field to multipart data
-     * @param name Field name
+     *
+     * @param name  Field name
      * @param value Field value
-     * @return
+     * @return self
      */
     public MultipartDataBuilder addHeaderField(String name, String value) {
         headersFields.put(name, value);
@@ -66,9 +68,10 @@ public class MultipartDataBuilder {
 
     /**
      * Adds data field to multipart data
-     * @param name Field name
+     *
+     * @param name  Field name
      * @param value Field value
-     * @return
+     * @return self
      */
     public MultipartDataBuilder addFormField(String name, String value) {
         formFields.put(name, value);
@@ -77,9 +80,10 @@ public class MultipartDataBuilder {
 
     /**
      * Add file field to multipart data. You need to override BinaryField for get stream
+     *
      * @param name Field name
      * @param file Your implementation of BinaryField
-     * @return
+     * @return self
      */
     public MultipartDataBuilder addFormFile(String name, BinaryField file) {
         formFiles.put(name, file);
@@ -88,10 +92,11 @@ public class MultipartDataBuilder {
 
     /**
      * Add file from filesystem to multipart data. It change file name to given by you
-     * @param name Field name
-     * @param file Your file
+     *
+     * @param name     Field name
+     * @param file     Your file
      * @param fileName New file name
-     * @return
+     * @return self
      */
     public MultipartDataBuilder addFormFile(String name, File file, String fileName) {
         formFiles.put(name, new FileField(file, fileName));
@@ -100,9 +105,10 @@ public class MultipartDataBuilder {
 
     /**
      * Add file from filesystem to multipart data. It leave file name from file system.
+     *
      * @param name Field name
      * @param file Your file
-     * @return
+     * @return self
      */
     public MultipartDataBuilder addFormFile(String name, File file) {
         formFiles.put(name, new FileField(file));
@@ -110,46 +116,42 @@ public class MultipartDataBuilder {
     }
 
     private void finalizeContent() throws IOException {
-        writer.append("--" + boundary + "--" + LINE_FEED);
+        writer.append("--").append(boundary).append("--").append(LINE_FEED);
         writer.close();
     }
 
+    @SuppressWarnings("TryFinallyCanBeTryWithResources")
     private void sendContent() throws IOException {
         outputStream = connection.getOutputStream();
         writer = new PrintWriter(outputStream);
 
         //headers
         for (Map.Entry<String, String> entry : headersFields.entrySet()) {
-            writer.append(entry.getKey() + ": " + entry.getValue() + LINE_FEED);
-            writer.flush();
+            writer.append(entry.getKey()).append(": ").append(entry.getValue()).append(LINE_FEED);
         }
         //fields
         for (Map.Entry<String, String> entry : formFields.entrySet()) {
-            writer.append("--" + boundary + LINE_FEED);
-            writer.append("Content-Disposition: form-data; name=\"" + entry.getKey() + "\"" + LINE_FEED);
-            writer.append("Content-Type: text/plain; charset=" + charset + LINE_FEED);
+            writer.append("--").append(boundary).append(LINE_FEED);
+            writer.append("Content-Disposition: form-data; name=\"").append(entry.getKey()).append("\"").append(LINE_FEED);
+            writer.append("Content-Type: text/plain; charset=").append(charset).append(LINE_FEED);
             writer.append(LINE_FEED);
-            writer.append(entry.getValue() + LINE_FEED);
-            writer.flush();
+            writer.append(entry.getValue()).append(LINE_FEED);
         }
         //files
         for (Map.Entry<String, BinaryField> entry : formFiles.entrySet()) {
             BinaryField binaryField = entry.getValue();
-            writer.append("--" + boundary + LINE_FEED);
+            writer.append("--").append(boundary).append(LINE_FEED);
             writer.append(
-                    "Content-Disposition: form-data; name=\"" + entry.getKey()
-                            + "\"; filename=\"" + binaryField.getFileName() + "\"" + LINE_FEED);
-            writer.append(
-                    "Content-Type: "
-                            + URLConnection.guessContentTypeFromName(binaryField.getFileName()) + LINE_FEED);
-            writer.append("Content-Transfer-Encoding: binary" + LINE_FEED);
+                    "Content-Disposition: form-data; name=\"").append(entry.getKey()).append("\"; filename=\"").append(binaryField.getFileName()).append("\"").append(LINE_FEED);
+            writer.append("Content-Type: ").append(URLConnection.guessContentTypeFromName(binaryField.getFileName())).append(LINE_FEED);
+            writer.append("Content-Transfer-Encoding: binary").append(LINE_FEED);
             writer.append(LINE_FEED);
             writer.flush();
 
             InputStream inputStream = binaryField.getStream();
             try {
                 byte[] buffer = new byte[4096];
-                int bytesRead = -1;
+                int bytesRead;
                 while ((bytesRead = inputStream.read(buffer)) != -1) {
                     outputStream.write(buffer, 0, bytesRead);
                 }
@@ -159,8 +161,8 @@ public class MultipartDataBuilder {
             outputStream.flush();
 
             writer.append(LINE_FEED);
-            writer.flush();
         }
+        writer.flush();
     }
 
     public void build() throws IOException {
@@ -200,6 +202,15 @@ public class MultipartDataBuilder {
             fileName = name;
         }
 
+        /**
+         * This method allow open stream immediatelly when file sending.
+         * If you have already opended stream, you can return him.
+         * Then file was send, stream will be closed.
+         * To avoid this behavior, override close() method
+         *
+         * @return your stream
+         * @throws IOException
+         */
         protected abstract InputStream openStream() throws IOException;
 
         @Override

@@ -33,15 +33,15 @@ public class MainActivity extends AppCompatActivity {
             HttpURLConnection connection = null;
             String content = null;
             try {
+                //Make our connection
                 URL url = new URL("http://httpbin.org/post");
                 connection = (HttpURLConnection) url.openConnection();
                 //Make builder with connection and charset
                 MultipartDataBuilder builder = new MultipartDataBuilder(connection, "UTF-8");
                 //Add fields
                 builder
-                        //This server does not accept headers :(
-                        //.addHeaderField("Header1", "I am header 1").addHeaderField("Header2", "I am header 2")
-                        .addFormField("Form1", "I am Form 1").addFormField("Form2", "I am Form 2")
+                        .addFormField("Form1", "I am Form 1")
+                        .addFormField("Form2", "I am Form 2")
                         //Sending file as InputStream.
                         .addFormFile("FormFile1", new MultipartDataBuilder.BinaryField("testfile.txt") {
                             @Override
@@ -49,11 +49,11 @@ public class MainActivity extends AppCompatActivity {
                                 return getAssets().open("my_asset.txt");
                             }
                         })
-                //Or you can send simple file like this:
-                //.addFormFile("Field",new File("/sdcard/myfile.jpg"));
-                ;
-                //Post data
-                builder.build();
+                        //Or you can send simple file like this:
+                        //.addFormFile("Field",new File("/sdcard/myfile.jpg"))
+
+                        //Post data
+                        .build();
                 InputStream in = connection.getInputStream();
                 //Simplest way to get String from InputStream
                 Scanner scanner = new Scanner(in, "UTF-8").useDelimiter("\\A"); //Scan to the end of file
