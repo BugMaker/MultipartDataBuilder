@@ -26,13 +26,11 @@ It simple to use:
     InputStream in = connection.getInputStream();
     //Analyze server response
 
-Including library in your project with .gradle file:
+Include library in your project with .gradle file:
 
-    //Make sure, what you include my maven repository
+    //Make sure, what jcenter() exists in repositories
     repositories {
-        maven {
-            url "http://dl.bintray.com/bugmaker/maven"
-        }
+        jcenter()
     }
 
     dependencies {
