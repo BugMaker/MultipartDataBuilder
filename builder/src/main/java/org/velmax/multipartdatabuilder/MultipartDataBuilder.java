@@ -1,5 +1,6 @@
 package org.velmax.multipartdatabuilder;
 
+import java.io.ByteArrayInputStream;
 import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
@@ -42,13 +43,12 @@ public class MultipartDataBuilder {
         this.connection = connection;
     }
 
-    private void prepareConnection() throws IOException {
+    protected void prepareConnection() throws IOException {
         // creates a unique boundary based on time stamp
         boundary = "***AndroidMultipartBoundary" + System.currentTimeMillis() + "***";
 
         connection.setDoOutput(true);
         connection.setDoInput(true);
-        connection.setInstanceFollowRedirects(false);
         connection.setRequestMethod("POST");
         connection.setRequestProperty("Content-Type",
                 "multipart/form-data; boundary=" + boundary);
@@ -112,6 +112,18 @@ public class MultipartDataBuilder {
      */
     public MultipartDataBuilder addFormFile(String name, File file) {
         formFiles.put(name, new FileField(file));
+        return this;
+    }
+
+    /**
+     * Add file from byte array
+     * @param name Field name
+     * @param data Your array
+     * @param fileName New file name
+     * @return
+     */
+    public MultipartDataBuilder addFormFile(String name, byte[] data, String fileName){
+        formFiles.put(name, new ByteArrayField(fileName, data));
         return this;
     }
 
@@ -238,8 +250,23 @@ public class MultipartDataBuilder {
         protected InputStream openStream() throws IOException {
             return new FileInputStream(file);
         }
+    }
 
+    /**
+     * Implementation for byte arrays
+     */
+    private static class ByteArrayField extends BinaryField {
+        byte[] mData;
 
+        public ByteArrayField(String fileName, byte[] data) {
+            super(fileName);
+            mData = data;
+        }
+
+        @Override
+        protected InputStream openStream() throws IOException {
+            return new ByteArrayInputStream(mData);
+        }
     }
 
 }

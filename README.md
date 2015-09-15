@@ -20,6 +20,8 @@ It simple to use:
         })
         //Or you can send simple file like this:
         .addFormFile("Field",new File("/sdcard/myfile.jpg"))
+        //Or add byte array
+        .addFormFile("Field", new byte[]{1,2,3,4,5}, "myfile.jpg"))
         //Post data
         .build();
 
@@ -35,5 +37,5 @@ Include library in your project with .gradle file:
 
     dependencies {
         //Your project dependencies here
-        compile 'org.velmax.multipartdata:builder:1.0.0'
+        compile 'org.velmax.multipartdata:builder:1.0.1'
     }

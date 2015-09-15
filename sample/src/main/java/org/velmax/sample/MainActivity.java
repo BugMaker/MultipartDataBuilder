@@ -49,6 +49,7 @@ public class MainActivity extends AppCompatActivity {
                                 return getAssets().open("my_asset.txt");
                             }
                         })
+                                .addFormFile("FormFile2", new byte[]{1,2,3,4,5},"test.bin")
                         //Or you can send simple file like this:
                         //.addFormFile("Field",new File("/sdcard/myfile.jpg"))
 

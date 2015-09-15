@@ -31,7 +31,7 @@ ext {
     siteUrl = 'https://github.com/BugMaker/MultipartDataBuilder'
     gitUrl = 'https://github.com/BugMaker/MultipartDataBuilder.git'
 
-    libraryVersion = '1.0.0'
+    libraryVersion = '1.0.1'
 
     developerId = 'bugmaker'
     developerName = 'Max Eltsov'
